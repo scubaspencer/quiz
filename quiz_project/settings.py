@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta  # Add this for JWT token lifetime configuration
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,7 +39,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "rest_framework",
+    "rest_framework",  # Required for Django REST Framework
+    "rest_framework_simplejwt.token_blacklist",  # Required for JWT token blacklist
     "quiz",
 ]
 
@@ -126,6 +128,29 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# CORS settings to allow requests from your React frontend
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # Allow requests from your React app
 ]
+
+# Django REST Framework settings
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",  # JWT Authentication
+    ),
+}
+
+# Simple JWT configuration
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(
+        minutes=60
+    ),  # Access token lifetime (60 minutes)
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),  # Refresh token lifetime (1 day)
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,  # Use your Django secret key for signing tokens
+    "AUTH_HEADER_TYPES": (
+        "Bearer",
+    ),  # Expect tokens in the "Authorization: Bearer <token>" header
+}
