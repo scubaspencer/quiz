@@ -11,6 +11,10 @@ urlpatterns = [
     path(
         "api/questions/<int:pk>/", views.modify_question, name="modify-question"
     ),  # PUT and DELETE questions
+    # Endpoint for submitting the quiz and updating scores
+    path(
+        "api/submit-quiz/", views.submit_quiz, name="submit-quiz"
+    ),  # POST quiz answers and update score
     # JWT Authentication endpoints
     path(
         "api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"

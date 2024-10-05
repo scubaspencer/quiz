@@ -1,8 +1,7 @@
-# quiz/views.py
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from .models import Question
+from .models import Question, Profile
 from .serializers import QuestionSerializer
 
 
@@ -40,3 +39,43 @@ def modify_question(request, pk):
     if request.method == "DELETE":
         question.delete()
         return Response({"message": "Question deleted successfully."}, status=204)
+
+
+@api_view(["POST"])
+@permission_classes(
+    [IsAuthenticated]
+)  # Require authentication for submitting quiz answers
+def submit_quiz(request):
+    """
+    Endpoint to submit quiz answers, calculate score, and update user's total score.
+    """
+    user = request.user  # The authenticated user
+    data = request.data  # Data from the frontend, including selected answers
+    correct_answers = 0  # Track the number of correct answers
+
+    for answer_data in data["answers"]:
+        question_id = answer_data.get("question_id")
+        selected_answer_id = answer_data.get("selected_answer")
+
+        try:
+            question = Question.objects.get(id=question_id)
+        except Question.DoesNotExist:
+            continue
+
+        # Check if the selected answer is correct
+        if question.answers.filter(id=selected_answer_id, is_correct=True).exists():
+            correct_answers += 1
+
+    # Update user's total score
+    profile = Profile.objects.get(user=user)
+    profile.total_score += correct_answers
+    profile.save()
+
+    return Response(
+        {
+            "message": "Quiz submitted successfully.",
+            "correct_answers": correct_answers,
+            "total_score": profile.total_score,
+        },
+        status=200,
+    )
