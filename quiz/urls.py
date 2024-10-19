@@ -15,6 +15,10 @@ urlpatterns = [
     path(
         "api/submit-quiz/", views.submit_quiz, name="submit-quiz"
     ),  # POST quiz answers and update score
+    # Endpoint for gifting points
+    path(
+        "api/gift-points/", views.gift_points, name="gift-points"
+    ),  # POST to gift points to another user
     # JWT Authentication endpoints
     path(
         "api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"

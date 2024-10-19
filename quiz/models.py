@@ -1,3 +1,4 @@
+# models.py
 from django.db import models
 from django.contrib.auth.models import User  # Import the built-in User model
 
@@ -5,9 +6,12 @@ from django.contrib.auth.models import User  # Import the built-in User model
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     total_score = models.IntegerField(default=0)  # Field to store the total score
+    points = models.IntegerField(
+        default=0
+    )  # Field to store points available for gifting
 
     def __str__(self):
-        return f"{self.user.username} - Total Score: {self.total_score}"
+        return f"{self.user.username} - Total Score: {self.total_score}, Points: {self.points}"
 
 
 class Question(models.Model):
